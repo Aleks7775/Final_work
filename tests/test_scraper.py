@@ -59,8 +59,7 @@ class TestScraper(unittest.TestCase):
         self.base_url = "https://goldapple.ru"
 
     def test_product_successful(self):
-        """Тест, тест продуктов га главной странице."""
-        # Вызов тестируемого метода
+        """Тест, тест продуктов на главной странице."""
         self.scraper.name_product(self.mock_soup)
         self.scraper.price_product(self.mock_soup)
         self.scraper.rating_product(self.mock_soup)
@@ -87,11 +86,10 @@ class TestScraper(unittest.TestCase):
 
     @patch('requests.get')
     def test_information_one_product(self, mock_get):
+        """Тесты на странице продукта"""
 
-        # Устанавливаем ссылки для тестирования
         self.scraper.product_links = ["http://goldapple.ru/product-1"]
 
-        # Создаем фиктивный ответ для requests.get
         mock_response = Mock()
         mock_response.text = MOCK_HTML_two
         mock_get.return_value = mock_response
@@ -100,7 +98,7 @@ class TestScraper(unittest.TestCase):
         self.scraper.application_product()
         self.scraper.country_product()
 
-
+        # Проверка результатов
         self.assertEqual(self.scraper.product_description, [
             "Описание для продукта One."])
         self.assertEqual(self.scraper.product_application, [
