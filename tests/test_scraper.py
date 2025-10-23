@@ -86,10 +86,10 @@ class TestScraper(unittest.TestCase):
 
 
     @patch('requests.get')
-    def test_description_and_application_product(self, mock_get):
+    def test_information_one_product(self, mock_get):
 
         # Устанавливаем ссылки для тестирования
-        self.scraper.product_links = ["http://example.com/product-1"]
+        self.scraper.product_links = ["http://goldapple.ru/product-1"]
 
         # Создаем фиктивный ответ для requests.get
         mock_response = Mock()
