@@ -25,7 +25,37 @@ MOCK_HTML_CONTENT = """
 </body>
 </html>
 """
+MOCK_HTML_two = """
+        <html>
+        <body>
+            <div itemprop="description">Описание для продукта One.</div>
+            <div>
+                <p>Применение: Нанести на кожу.</p>
+                <p>Страна производства: Франция</p>
+            </div>
+        </body>
+        </html>
+        <html>
+        <body>
+            <div itemprop="description">Описание для продукта Two.</div>
+            <div>
+                <p>Применение: Нанести на волосы.</p>
+                <p>Страна производства: Италия</p>
+            </div>
+        </body>
+        </html>
+    """
+
 MOCK_HTML_zero = """
+<body>
+    <div class="iVXPq">
+        <div>
+        <div>
+    </div>
+    <div class="iVXPq">
+    </div>
+</body>
+</html>
 """
 
 class TestScraper(unittest.TestCase):
@@ -34,6 +64,7 @@ class TestScraper(unittest.TestCase):
         """Настройка, которая выполняется перед каждым тестом."""
         self.scraper = Scraper()
         self.mock_soup = BeautifulSoup(MOCK_HTML_CONTENT, 'html.parser')
+        self.mock_soup_two = BeautifulSoup(MOCK_HTML_two, 'html.parser')
         self.mock_soup_zero = BeautifulSoup(MOCK_HTML_zero, 'html.parser')
         self.base_url = "https://goldapple.ru"
 
@@ -52,47 +83,13 @@ class TestScraper(unittest.TestCase):
         self.assertEqual(self.scraper.product_rating, ['4.5', '2.5'])
 
 
-    # def test_description_product_success(requests_mock):
-    #     """Тест успешного извлечения описаний для нескольких продуктов."""
-    #     base_url = "https://goldapple.ru"
-    #
-    #     scraper = Scraper()
-    #
-    #     # Задаём фиктивные ссылки на страницы, которые будем мокировать
-    #     scraper.product_links = [
-    #         f"{base_url}/parfjumerija/product-one",
-    #         f"{base_url}/parfjumerija/product-two"
-    #     ]
-    #
-    #     # Настраиваем моки для каждого URL
-    #     requests_mock.get(
-    #         scraper.product_links[0],
-    #         text=MOCK_PRODUCT_PAGE["/parfjumerija/product-one"]
-    #     )
-    #     requests_mock.get(
-    #         scraper.product_links[1],
-    #         text=MOCK_PRODUCT_PAGE["/parfjumerija/product-two"]
-    #     )
-    #
-    #     # Вызываем тестируемый метод
-    #     scraper.description_product()
-    #
-    #     # Проверяем, что результаты соответствуют ожиданиям
-    #     assert scraper.product_description == [
-    #         "Описание для продукта One.",
-    #         "Описание не найдено"
-    #     ]
-    # def test_description(self):
-    #     self.scraper.description_product()
-    #
-    #     for link, html in MOCK_PRODUCT_PAGE.items():
-    #         m.get(f"{BASE_URL}{link}", text=html)
-    #
-    #     # Проверка результатов
-    #     self.assertEqual(self.scraper.product_description, ["", ""])
+    def test_missing_goods(self):
 
-        # на отсутствие
-        # self.assertEqual(self.scraper.product_price, ['Цена отсутствует', 'Цена отсутствует'])
-        # self.assertEqual(self.scraper.product_rating, ['Рейтинг отсутствует', 'Рейтинг отсутствует'])
+        self.scraper.name_product(self.mock_soup_zero)
+        self.scraper.price_product(self.mock_soup_zero)
+        self.scraper.rating_product(self.mock_soup_zero)
 
-
+        self.assertEqual(self.scraper.product_brand, [])
+        self.assertEqual(self.scraper.product_name, [])
+        self.assertEqual(self.scraper.product_price, ['Цена отсутствует', 'Цена отсутствует'])
+        self.assertEqual(self.scraper.product_rating, ['Рейтинг отсутствует', 'Рейтинг отсутствует'])

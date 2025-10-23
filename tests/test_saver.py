@@ -41,16 +41,3 @@ def test_write_to_csv_success(mocker):
 
     # Проверяем, что open() был вызван с правильными аргументами
     mock_file.assert_called_once_with('test_products.csv', mode='w', newline='', encoding='utf-8')
-
-    # # Получаем мок-объект, который имитирует csv-писателя.
-    # mock_writer = mock_file().writerow
-    #
-    # # Проверяем, что были вызваны правильные методы writerow() с корректными данными.
-    # expected_calls = [
-    #     ['Ссылка', 'Бренд', 'Название продукта', 'Цена', 'Рейтинг', 'Описание', 'Инструкция', 'Страна-производитель'],
-    #     ['link1', 'brandA', 'name1', 100, 4.5, 'desc1', 'app1', 'country1'],
-    #     ['link2', 'brandB', 'name2', 200, 4.0, 'desc2', 'app2', 'country2']
-    # ]
-    #
-    # for row in expected_calls:
-    #     mock_writer.assert_any_call(row)
