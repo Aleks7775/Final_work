@@ -29,21 +29,11 @@ MOCK_HTML_two = """
         <html>
         <body>
             <div itemprop="description">Описание для продукта One.</div>
-            <div>
-                <p>Применение: Нанести на кожу.</p>
-                <p>Страна производства: Франция</p>
-            </div>
+            <div text="Применение">Применение: Нанести на кожу.</div>
+            <div text="Дополнительная информация">Франция </div>
         </body>
         </html>
         <html>
-        <body>
-            <div itemprop="description">Описание для продукта Two.</div>
-            <div>
-                <p>Применение: Нанести на волосы.</p>
-                <p>Страна производства: Италия</p>
-            </div>
-        </body>
-        </html>
     """
 
 MOCK_HTML_zero = """
@@ -93,3 +83,27 @@ class TestScraper(unittest.TestCase):
         self.assertEqual(self.scraper.product_name, [])
         self.assertEqual(self.scraper.product_price, ['Цена отсутствует', 'Цена отсутствует'])
         self.assertEqual(self.scraper.product_rating, ['Рейтинг отсутствует', 'Рейтинг отсутствует'])
+
+
+    @patch('requests.get')
+    def test_description_and_application_product(self, mock_get):
+
+        # Устанавливаем ссылки для тестирования
+        self.scraper.product_links = ["http://example.com/product-1"]
+
+        # Создаем фиктивный ответ для requests.get
+        mock_response = Mock()
+        mock_response.text = MOCK_HTML_two
+        mock_get.return_value = mock_response
+
+        self.scraper.description_product()
+        self.scraper.application_product()
+        self.scraper.country_product()
+
+
+        self.assertEqual(self.scraper.product_description, [
+            "Описание для продукта One."])
+        self.assertEqual(self.scraper.product_application, [
+            "Применение: Нанести на кожу."])
+        self.assertEqual(self.scraper.product_country, [
+            "Франция"])
