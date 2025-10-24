@@ -2,6 +2,16 @@ from urllib.parse import urljoin
 import time
 import requests
 from bs4 import BeautifulSoup
+import random
+
+""" Добавление рандомного прокси"""
+proxies = {
+  'http': 'http://10.10.1.10:3128',
+  'https': 'http://10.10.1.10:1080',
+}
+
+selected_proxy = random.choice(list(proxies.items()))
+selected_proxy=dict([selected_proxy])
 
 
 class Scraper:
@@ -22,7 +32,7 @@ class Scraper:
         for page_num in range(1, total_pages + 1):
             url = f"{base_url}/parfjumerija?p={page_num}"
             try:
-                response = requests.get(url)
+                response = requests.get(url, selected_proxy)
                 response.raise_for_status()  # Проверка на успешный ответ (200 OK)
                 soup = BeautifulSoup(response.text, "html.parser")
 
@@ -42,18 +52,18 @@ class Scraper:
 
     def name_product(self, soup):
         """Извлекает бренд и наименование продукта"""
-        name_containers = soup.find_all(class_="iVXPq")
+        name_containers = soup.find_all(class_="eiuKr")
 
         for container in name_containers:
-            brand_span = container.find("span", class_="iyrAY")
-            name_span = container.find("span", class_="kfy9O")
+            brand_span = container.find("span", class_="b9aly")
+            name_span = container.find("span", class_="jHFTe")
             if brand_span and name_span:
                 self.product_brand.append(brand_span.get_text(strip=True))
                 self.product_name.append(name_span.get_text(strip=True))
 
     def price_product(self, soup):
         """Извлекает цены продуктов"""
-        price_containers = soup.find_all(class_="iVXPq")
+        price_containers = soup.find_all(class_="eiuKr")
 
         for container in price_containers:
             price = container.find("meta", itemprop="price")
@@ -64,7 +74,7 @@ class Scraper:
 
     def links_product(self, soup, base_url):
         """Извлекает ссылки продуктов"""
-        links_containers = soup.find_all(class_="iVXPq")
+        links_containers = soup.find_all(class_="eiuKr")
 
         for container in links_containers:
             links = container.find("a")["href"]
@@ -76,7 +86,7 @@ class Scraper:
 
     def rating_product(self, soup):
         """Извлекает рейтинг продуктов"""
-        rating_containers = soup.find_all(class_="iVXPq")
+        rating_containers = soup.find_all(class_="eiuKr")
 
         for container in rating_containers:
             rating = container.find("meta", itemprop="ratingValue")
@@ -88,7 +98,7 @@ class Scraper:
     def description_product(self):
         """Извлекает описание продуктов"""
         for link in self.product_links:
-            link_request = requests.get(link)
+            link_request = requests.get(link, selected_proxy)
             description_soup = BeautifulSoup(link_request.text, "html.parser")
             description = description_soup.find("div", itemprop="description")
             if description:
@@ -99,7 +109,7 @@ class Scraper:
     def application_product(self):
         """Извлекает инструкцию продуктов"""
         for link in self.product_links:
-            link_request = requests.get(link)
+            link_request = requests.get(link, selected_proxy)
             application_soup = BeautifulSoup(link_request.text, "html.parser")
             application = application_soup.find("div", attrs={"text": "Применение"})
             if application:
@@ -110,7 +120,7 @@ class Scraper:
     def country_product(self):
         """Извлекает Страна-производитель продуктов"""
         for link in self.product_links:
-            link_request = requests.get(link)
+            link_request = requests.get(link, selected_proxy)
             country_soup = BeautifulSoup(link_request.text, "html.parser")
             country = country_soup.find(
                 "div", attrs={"text": "Дополнительная информация"}
